@@ -383,3 +383,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
+
+
+  azlistview: ^2.0.0
+  alphabet_scroll_view: ^0.3.2
