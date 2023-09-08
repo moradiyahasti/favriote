@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
 
 
 
-
 import 'package:colorful_circular_progress_indicator/colorful_circular_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -39,7 +38,7 @@ import 'package:music_appp/model/album.dart';
 import 'package:music_appp/screen/homedetails.dart';
 import 'package:provider/provider.dart';
 
-import '../fav_provider.dart';
+import '../provider/fav_provider.dart';
 
 class Home_Screen extends StatefulWidget {
   const Home_Screen({super.key});
@@ -78,7 +77,7 @@ class _Home_ScreenState extends State<Home_Screen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color(0xFFf0eddd),
+        backgroundColor: const Color(0xFFf0eddd),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(100.0),
           child: AppBar(
@@ -102,13 +101,35 @@ class _Home_ScreenState extends State<Home_Screen> {
           future: albumHomeFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                  child: ColorfulCircularProgressIndicator(
-                colors: [Colors.blue, Colors.red, Colors.amber, Colors.green],
-                strokeWidth: 5,
-                indicatorHeight: 40,
-                indicatorWidth: 40,
-              ));
+              return Center(
+                child: Container(
+                  height: 70,
+                  width: 170,
+                  color: Colors.black87,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const ColorfulCircularProgressIndicator(
+                        colors: [
+                          Colors.white,
+                          Colors.grey,
+                        ],
+                        strokeWidth: 5,
+                        indicatorHeight: 37,
+                        indicatorWidth: 37,
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        'Loading...',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             } else if (snapshot.hasError) {
               return Center(
                 child: Text('Error: ${snapshot.error}'),
@@ -135,24 +156,21 @@ class _Home_ScreenState extends State<Home_Screen> {
                         .isItemFavorite(itemTitle);
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomeDetailsscreen(
-                              name: albumHome?.albums[i].name ?? '',
-                              year: albumHome?.albums[i].year ?? '',
-                              bandName: albumHome?.albums[i].name ?? '',
-                              picture: albumHome?.albums[i].picture ?? '',
-                              rating: albumHome?.albums[i].rating ?? '',
-                              id: albumHome?.albums[i].id ?? "",
-                              bandId:
-                                  albumHome?.albums[i].bandId.toString() ?? "",
-                              updateFavoriteStatus: (isFavorite) {
-                                setState(() {});
-                              },
-                            ),
+                        Navigator.of(context, rootNavigator: true)
+                            .push(MaterialPageRoute(
+                          builder: (context) => HomeDetailsscreen(
+                            name: albumHome.albums[i].name ?? '',
+                            year: albumHome.albums[i].year ?? '',
+                            bandName: albumHome.albums[i].name,
+                            picture: albumHome.albums[i].picture ?? '',
+                            rating: albumHome.albums[i].rating,
+                            id: albumHome.albums[i].id ?? "",
+                            bandId: albumHome.albums[i].bandId.toString() ?? "",
+                            updateFavoriteStatus: (isFavorite) {
+                              setState(() {});
+                            },
                           ),
-                        );
+                        ));
                       },
                       child: Column(
                         children: [
@@ -185,7 +203,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Container(
-                                        constraints: BoxConstraints(
+                                        constraints: const BoxConstraints(
                                             maxWidth:
                                                 250), // Adjust the maxWidth as needed
                                         child: Text(
@@ -203,28 +221,27 @@ class _Home_ScreenState extends State<Home_Screen> {
                                               .push(MaterialPageRoute(
                                             builder: (context) =>
                                                 HomeDetailsscreen(
-                                              name: albumHome?.albums[i].name ??
+                                              name: albumHome.albums[i].name ??
                                                   '',
-                                              year: albumHome?.albums[i].year ??
+                                              year: albumHome.albums[i].year ??
                                                   '',
                                               bandName:
-                                                  albumHome?.albums[i].name ??
+                                                  albumHome.albums[i].name ??
                                                       '',
-                                              picture: albumHome
-                                                      ?.albums[i].picture ??
-                                                  '',
+                                              picture:
+                                                  albumHome.albums[i].picture ??
+                                                      '',
                                               rating:
-                                                  albumHome?.albums[i].rating ??
+                                                  albumHome.albums[i].rating ??
                                                       '',
-                                              bandId: albumHome
-                                                      ?.albums[i].bandId
+                                              bandId: albumHome.albums[i].bandId
                                                       .toString() ??
                                                   "",
                                               updateFavoriteStatus:
                                                   (isFavorite) {
                                                 setState(() {});
                                               },
-                                              id: albumHome?.albums[i]
+                                              id: albumHome.albums[i]
                                                   .toString(),
                                             ),
                                           ));
@@ -286,7 +303,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                                   ),
                                   color: isFavorite
                                       ? Colors.red
-                                      : Color(0xFFBDBDBD),
+                                      : const Color(0xFFBDBDBD),
                                   onPressed: () {
                                     final favoriteProvider =
                                         Provider.of<FavoriteProvider>(context,
@@ -342,15 +359,47 @@ class _Home_ScreenState extends State<Home_Screen> {
   }
 }
 
-=====================
 
 
 
-  import 'dart:convert';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import 'dart:convert';
+import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:colorful_circular_progress_indicator/colorful_circular_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:music_appp/screen/homescreen.dart';
 import '../model/songdetails.dart';
 import 'package:http/http.dart' as http;
 
@@ -384,18 +433,13 @@ class HomeDetailsscreen extends StatefulWidget {
 class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
   BandDetails? bandDetails;
   bool isLoading = true;
-  final audioPlayer = AudioPlayer();
-  bool isPlaying = false;
-  Duration duration = Duration.zero;
-  Duration position = Duration.zero;
   var song;
+  AudioPlayer audioPlayer = AudioPlayer();
 
-  // audioPlayerState = AudioPlayerState;
   @override
   void initState() {
     super.initState();
     getBandDetails();
-    setAudio();
   }
 
   @override
@@ -425,10 +469,17 @@ class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color(0xFFf0eddd),
+        backgroundColor: const Color(0xFFf0eddd),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(100.0),
           child: AppBar(
+            leading: IconButton(
+              color: Colors.white,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back_ios),
+            ),
             elevation: 0,
             flexibleSpace: Stack(
               children: [
@@ -445,13 +496,35 @@ class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
           ),
         ),
         body: isLoading
-            ? const Center(
-                child: ColorfulCircularProgressIndicator(
-                colors: [Colors.blue, Colors.red, Colors.amber, Colors.green],
-                strokeWidth: 5,
-                indicatorHeight: 40,
-                indicatorWidth: 40,
-              ))
+            ? Center(
+                child: Container(
+                  height: 70,
+                  width: 170,
+                  color: Colors.black87,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const ColorfulCircularProgressIndicator(
+                        colors: [
+                          Colors.white,
+                          Colors.grey,
+                        ],
+                        strokeWidth: 5,
+                        indicatorHeight: 37,
+                        indicatorWidth: 37,
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        'Loading...',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             : Column(
                 children: [
                   Padding(
@@ -459,7 +532,7 @@ class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
                     child: Container(
                       margin: const EdgeInsets.only(right: 0, left: 0, top: 5),
                       decoration: BoxDecoration(
-                        color: Color(0xFFf0eddd),
+                        color: const Color(0xFFf0eddd),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -488,7 +561,7 @@ class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
                                     fontSize: 20,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 2,
                                 ),
                                 Row(
@@ -508,7 +581,7 @@ class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
                                             fontSize: 16,
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 2,
                                         ),
                                         Text(
@@ -522,7 +595,7 @@ class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 2,
                                 ),
                                 Row(
@@ -554,17 +627,23 @@ class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
                             "http://www.kbmusique.com/songs/${song?.sgUrl}";
                         String index = (i + 1).toString().padLeft(2, '0');
 
-                        return GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            color: Colors.white,
-                            child: ListTile(
-                              title: Text(
-                                '$index ${'   '}${song?.sgName.toString() ?? ""}',
-                                style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w500, fontSize: 18),
+                        return Container(
+                          color: Colors.white,
+                          child: ListTile(
+                            title: Text(
+                              '$index ${'   '}${song?.sgName.toString() ?? ""}',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
                               ),
                             ),
+                            subtitle: Text(audioUrl.toString()),
+                            onTap: () async {
+                              if (audioPlayer.state == PlayerState.playing) {
+                                await audioPlayer.stop();
+                              }
+                              await audioPlayer.play(audioUrl as Source);
+                            },
                           ),
                         );
                       },
@@ -587,20 +666,5 @@ class _HomeDetailsscreenState extends State<HomeDetailsscreen> {
       throw Exception('Failed to load band details');
     }
   }
-
-  Future<void> setAudio() async {
-    audioPlayer.setReleaseMode(ReleaseMode.loop);
-    String url =
-        "https://storage.googleapis.com/uamp/The_Kyoto_Connection_-_Wake_Up/08_-_Reveal_the_Magic.mp3";
-    await audioPlayer.setSourceUrl(url);
-  }
-
-  String formatTime(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    final hours = twoDigits(duration.inHours);
-    final twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    final twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return [if (duration.inHours > 0) hours, twoDigitMinutes, twoDigitSeconds]
-        .join(':');
-  }
 }
+
